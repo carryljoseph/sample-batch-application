@@ -5,11 +5,11 @@ import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
 
-public class OrderRowMapper implements RowMapper<TrackedOrder> {
+public class OrderRowMapper implements RowMapper<Order> {
 
 	@Override
-	public TrackedOrder mapRow(ResultSet rs, int rowNum) throws SQLException {
-		TrackedOrder order = new TrackedOrder();
+	public Order mapRow(ResultSet rs, int rowNum) throws SQLException {
+		Order order = new Order();
 		order.setOrderId(rs.getLong("order_id"));
 		order.setCost(rs.getBigDecimal("cost"));
 		order.setEmail(rs.getString("email"));
@@ -18,8 +18,6 @@ public class OrderRowMapper implements RowMapper<TrackedOrder> {
 		order.setItemId(rs.getString("item_id"));
 		order.setItemName(rs.getString("item_name"));
 		order.setShipDate(rs.getDate("ship_date"));
-		order.setTrackingNumber(rs.getString("tracking_number"));
-		order.setFreeShipping(rs.getBoolean("free_shipping"));
 		return order;
 	}
 

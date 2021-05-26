@@ -3,8 +3,6 @@ package com.linkedin.batch;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import javax.validation.constraints.Pattern;
-
 public class Order {
 
 	private Long orderId;
@@ -13,7 +11,6 @@ public class Order {
 
 	private String lastName;
 
-	@Pattern(regexp = ".*\\.gov")
 	private String email;
 
 	private BigDecimal cost;
@@ -23,7 +20,6 @@ public class Order {
 	private String itemName;
 
 	private Date shipDate;
-	
 
 	public Long getOrderId() {
 		return orderId;

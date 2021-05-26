@@ -15,7 +15,7 @@ public class SimpleItemReader implements ItemReader<String> {
 	
 	private Iterator<String> iterator;
 	
-	 public SimpleItemReader() {
+	public SimpleItemReader() {
 		this.dataSet.add("1");
 		this.dataSet.add("2");
 		this.dataSet.add("3");
@@ -26,7 +26,7 @@ public class SimpleItemReader implements ItemReader<String> {
 
 	@Override
 	public String read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
-		return iterator.hasNext() ? iterator.next():null;
+		return iterator.hasNext() ? iterator.next():null; 
 	}
 
 }
