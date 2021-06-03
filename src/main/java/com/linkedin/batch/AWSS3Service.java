@@ -3,10 +3,7 @@ package com.linkedin.batch;
 import java.io.File;
 import java.util.List;
 
-import org.springframework.stereotype.Component;
-
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.CopyObjectResult;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest;
@@ -19,10 +16,10 @@ import com.amazonaws.services.s3.model.S3Object;
 public class AWSS3Service {
     private final AmazonS3 s3client;
 
-    public AWSS3Service() { 
-        this(new AmazonS3Client() {
-        }); 
-    } 
+//    public AWSS3Service() { 
+//        this(new AmazonS3Client() {
+//        }); 
+//    } 
     
     public AWSS3Service(AmazonS3 s3client) {
         this.s3client = s3client;

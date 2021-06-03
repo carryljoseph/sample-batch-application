@@ -33,8 +33,8 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream;
 public class LinkedinBatchApplication {
 	
 	private AWSCredentials credentials = new BasicAWSCredentials(
-	          "AKIAZDERS6KM7TQJF4AC", 
-	          "mVutuccoKFABLGgsfi9aubnbyBX2r2SlxDycr/w+"
+	          "", 
+	          ""
 	        );
 
 	public static String[] names = new String[] { "orderId", "firstName", "lastName", "email", "cost", "itemId",
@@ -124,10 +124,18 @@ public class LinkedinBatchApplication {
 		return this.stepBuilderFactory.get("chunkBasedStep").<Order, Order>chunk(1000).reader(itemReader())
 				.writer(itemWriter()).build();
 	}
+	
+	@Bean
+	public Step sftpFileTransferStep() throws Exception {
+		return this.stepBuilderFactory.get("sftpFileTransferStep").tasklet(new S3ToSFTPTest()).build();
+	}
 
 	@Bean
 	public Job job() throws Exception {
-		return this.jobBuilderFactory.get("job").start(chunkBasedStep()).build();
+		return this.jobBuilderFactory.get("job")
+				.start(chunkBasedStep())
+				.next(sftpFileTransferStep())
+				.build();
 	}
 
 	public static void main(String[] args) {
