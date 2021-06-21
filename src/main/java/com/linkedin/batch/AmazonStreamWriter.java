@@ -13,17 +13,21 @@ import org.springframework.core.io.WritableResource;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.BasicSessionCredentials;
+import com.amazonaws.auth.WebIdentityTokenCredentialsProvider;
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.securitytoken.AWSSecurityTokenService;
+import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder;
+import com.amazonaws.services.securitytoken.model.AssumeRoleRequest;
+import com.amazonaws.services.securitytoken.model.AssumeRoleResult;
+import com.amazonaws.services.securitytoken.model.Credentials;
 
 public class AmazonStreamWriter<Order> implements ItemWriter<Order>,ItemWriteListener<Order>{
 	
-	private AWSCredentials credentials = new BasicAWSCredentials(
-	          "AKIAZDERS6KM7TQJF4AC", 
-	          "mVutuccoKFABLGgsfi9aubnbyBX2r2SlxDycr/w+"
-	        );
 	
     private WritableResource resource;
     private DelimitedLineAggregator<Order> lineAggregator;
@@ -79,14 +83,35 @@ public class AmazonStreamWriter<Order> implements ItemWriter<Order>,ItemWriteLis
 
 	@Override
 	public void afterWrite(List<? extends Order> items) {
-		 AmazonS3 s3client = AmazonS3ClientBuilder
-		          .standard()
-		          .withCredentials(new AWSStaticCredentialsProvider(credentials))
-		          .withRegion(Regions.US_EAST_2)
-		          .build();
+//		String clientRegion = "us-east-2";
+//        String roleARN = "arn:aws:iam::625223070361:role/s3oidcAccess";
+//        String roleSessionName = "s3-oidc-Access";
+//
+//	AWSSecurityTokenService stsClient = AWSSecurityTokenServiceClientBuilder.standard()
+//			.withCredentials(WebIdentityTokenCredentialsProvider.create())
+//			.withRegion(clientRegion)
+//			.build();
+//
+//	AssumeRoleRequest roleRequest = new AssumeRoleRequest()
+//			.withRoleArn(roleARN)
+//			.withRoleSessionName(roleSessionName);
+//	AssumeRoleResult roleResponse = stsClient.assumeRole(roleRequest);
+//	Credentials sessionCredentials = roleResponse.getCredentials();
+
+	// Create a BasicSessionCredentials object that contains the credentials you just retrieved.
+//	BasicSessionCredentials awsCredentials = new BasicSessionCredentials(
+//			sessionCredentials.getAccessKeyId(),
+//			sessionCredentials.getSecretAccessKey(),
+//			sessionCredentials.getSessionToken());
+
+		 AmazonS3 s3client = AmazonS3ClientBuilder.defaultClient();
+//		          .standard()
+//		          .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+//		          .withRegion(Regions.US_EAST_2)
+//		          .build();
 	    try {
 			s3client.putObject(new com.amazonaws.services.s3.model.PutObjectRequest("cjsamplebatch", "output_file/output.txt", this.getResource().getInputStream(),new ObjectMetadata()));
-		} catch (IOException e) {
+	    } catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
