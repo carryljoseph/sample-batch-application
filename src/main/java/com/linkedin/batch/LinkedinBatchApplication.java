@@ -1,5 +1,6 @@
 package com.linkedin.batch;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
@@ -21,14 +22,25 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.ListObjectsV2Request;
+import com.amazonaws.services.s3.model.ListObjectsV2Result;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 
 @SpringBootApplication
 @EnableBatchProcessing
 public class LinkedinBatchApplication {
+	
+	private  AWSCredentials credentials = new BasicAWSCredentials(
+	          "AKIAZDERS6KM7TQJF4AC", 
+	          "mVutuccoKFABLGgsfi9aubnbyBX2r2SlxDycr/w+"
+	        );
 
 	private static final Logger logger = LoggerFactory.getLogger(LinkedinBatchApplication.class);
 
@@ -107,15 +119,24 @@ public class LinkedinBatchApplication {
 //				sessionCredentials.getSecretAccessKey(),
 //				sessionCredentials.getSessionToken());
 		logger.info("inside reader");
+		
+
 		AmazonS3 s3client = AmazonS3ClientBuilder
-				.defaultClient();
-//				.standard()
-//				.withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
-//				.withRegion(Regions.US_EAST_2)
-//				.build();
+//				.defaultClient();
+				.standard()
+				.withCredentials(new AWSStaticCredentialsProvider(credentials))
+				.withRegion(Regions.US_EAST_2)
+				.build();
 
 		AWSS3Service awsService = new AWSS3Service(s3client);
-		S3Object inputS3Obj = awsService.getObject("cjsamplebatch", "input_file/shipped_orders.csv");
+		StringBuilder str = new StringBuilder();
+		String currentdate = new DateTime().toString("yyyyMMdd");
+		str.append("input_file/shipped_orders.").append(currentdate);
+		ListObjectsV2Request req = new ListObjectsV2Request().withBucketName("cjsamplebatch").withPrefix(str.toString());
+		ListObjectsV2Result listing = s3client.listObjectsV2(req);
+		S3Object inputS3Obj = s3client.getObject("cjsamplebatch", listing.getObjectSummaries().get(0).getKey());
+		
+//		S3Object inputS3Obj = awsService.getObject("cjsamplebatch", "input_file/shipped_orders.csv");
 		S3ObjectInputStream inputStream = inputS3Obj.getObjectContent();
 		Resource resource = new InputStreamResource(inputStream);
 		FlatFileItemReader<Order> itemReader = new FlatFileItemReader<Order>();
